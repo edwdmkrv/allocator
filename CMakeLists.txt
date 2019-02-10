@@ -17,9 +17,9 @@ else (BUILD_TYPE_RELEASE)
 	set (LIB_SUBDIR "Debug")
 endif (BUILD_TYPE_RELEASE)
 
-# set (CMAKE_CXX_COMPILER "g++")
+set (CMAKE_CXX_COMPILER "g++")
 # set (CMAKE_CXX_COMPILER "clang++-6.0")
-set (CMAKE_CXX_COMPILER "icpc")
+# set (CMAKE_CXX_COMPILER "icpc")
 
 # Project stuff
 project (allocator
