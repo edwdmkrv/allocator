@@ -20,7 +20,7 @@ INSTANTIATE_TEST_CASE_P(SimpleDataset, TestLibrary,
 		},
 		Data{
 		}
-	),
+	)
 );
 
 int main(int argc, char *argv[]) {
