@@ -231,11 +231,11 @@ public:
 		std::cout << __PRETTY_FUNCTION__ << ": " << this << std::endl;
 	}
 
-	Container(Container const &v) = default;
-	Container(Container &&v) = default;
+	Container(Container const &) = default;
+	Container(Container &&) = default;
 
-	Container &operator =(Container &&v) = default;
-	Container &operator =(Container const &v) = default;
+	Container &operator =(Container &&) = default;
+	Container &operator =(Container const &) = default;
 
 	using ContainerExcecutive<X, A>::reserve;
 	using ContainerExcecutive<X, A>::emplace_back;
