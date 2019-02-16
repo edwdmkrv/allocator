@@ -89,20 +89,63 @@ public:
 	};
 
 	X *allocate(size_type const n) {
-		void *const p{malloc(n * sizeof *allocate(n))};
+		if (n == 1) {
+			if (!buf) {
+				if (!(buf = reinterpret_cast<decltype(buf)>(malloc(sizeof *buf)))) {
+					throw std::bad_alloc();
+				}
 
+				idx_t n{1};
 		std::cout << __PRETTY_FUNCTION__ << ", n = " << n << ", p = " << p << std::endl;
 
-		if (!p) {
-			throw std::bad_alloc{};
-		}
+				for (auto &item: *buf) {
+					item.idx = n++;
+				}
 
-		return reinterpret_cast<X *>(p);
+				current = 0;
+				filled = 0;
+			}
+
+			if (filled == N) {
+				throw std::bad_alloc{};
+			}
+
+			idx_t const allocated = current;
+
+			current = buf[0][current].idx;
+			filled++;
+
+			return &buf[0][allocated].val;
+		} else {
+			void *const p{malloc(n * sizeof *allocate(n))};
+
+
+			if (!p) {
+				throw std::bad_alloc{};
+			}
+
+			return reinterpret_cast<X *>(p);
+		}
 	}
 
 	void deallocate(X *const p, size_type const n) noexcept {
 		std::cout << __PRETTY_FUNCTION__ << ", n = " << n << ", p = " << p << std::endl;
-		free(p);
+		if (n == 1) {
+			if ((p >= &buf[0]->val || p < &buf[1]->val) && filled > 0) {
+				idx_t const precurrent{static_cast<idx_t>(p - &buf[0]->val)};
+
+				buf[0][precurrent].idx = current;
+				current = precurrent;
+
+				if (!--filled) {
+					free(buf);
+					buf = nullptr;
+					current = 0;
+				}
+			}
+		} else {
+			free(p);
+		}
 	}
 };
 
