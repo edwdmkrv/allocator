@@ -213,7 +213,7 @@ protected:
 template <typename X, typename A = std::allocator<X>>
 class Container: private AllocatorWrapper<X, A>, protected ContainerExcecutive<X, A> {
 public:
-	Container() noexcept : ContainerExcecutive<X, A>{AllocatorWrapper<X, A>::allocator} {
+	Container() noexcept(noexcept(A{})) : ContainerExcecutive<X, A>{AllocatorWrapper<X, A>::allocator} {
 		std::cout << __PRETTY_FUNCTION__ << ": " << this << std::endl;
 	}
 
