@@ -1,6 +1,7 @@
 #ifndef __LIB_INCLUDED
 #define __LIB_INCLUDED
 
+#include <cstdint>
 #include <cstdlib>
 
 #include <new>
