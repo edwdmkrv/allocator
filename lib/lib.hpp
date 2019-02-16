@@ -89,7 +89,7 @@ public:
 	};
 
 	X *allocate(size_type const n) {
-		if (n == 1) {
+		if (n == 1 && filled != N) {
 			if (!buf) {
 				if (!(buf = reinterpret_cast<decltype(buf)>(malloc(sizeof *buf)))) {
 					throw std::bad_alloc();
@@ -104,10 +104,6 @@ public:
 
 				current = 0;
 				filled = 0;
-			}
-
-			if (filled == N) {
-				throw std::bad_alloc{};
 			}
 
 			idx_t const allocated = current;
@@ -130,8 +126,8 @@ public:
 
 	void deallocate(X *const p, size_type const n) noexcept {
 		std::cout << __PRETTY_FUNCTION__ << ", n = " << n << ", p = " << p << std::endl;
-		if (n == 1) {
-			if ((p >= &buf[0]->val || p < &buf[1]->val) && filled > 0) {
+		if (n == 1 && (p >= &buf[0]->val || p < &buf[1]->val)) {
+			if (filled > 0) {
 				idx_t const precurrent{static_cast<idx_t>(p - &buf[0]->val)};
 
 				buf[0][precurrent].idx = current;
