@@ -6,6 +6,7 @@
 #include <new>
 #include <memory>
 #include <utility>
+#include <limits>
 #include <type_traits>
 
 #include <iostream>
@@ -103,6 +104,29 @@ private:
 		
 			std::allocator_traits<A>::deallocate(allocator, p, asize);
 		};
+	static constexpr std::size_t min_size(std::size_t const numerator, std::size_t const denominator, std::size_t const val = 0) {
+		return (val * numerator + denominator / 2) / denominator > val ? val : min_size(numerator, denominator, val + 1);
+	}
+
+	std::size_t new_size() const {
+		enum: std::size_t {
+			size_t_max = std::numeric_limits<std::size_t>::max(),
+			numerator = 21,
+			denominator = 13
+		}; // 21 / 13 ~ (sqrt(5) + 1) / 2 (golden section)
+
+		if (asize == size_t_max) {
+			throw std::bad_alloc{};
+		}
+
+		return
+			asize == 0 ?
+				min_size(numerator, denominator) :
+			asize < (size_t_max - denominator / 2) / numerator ?
+				(asize * numerator + denominator / 2) / denominator :
+			asize < size_t_max / numerator * denominator ?
+				asize / denominator * numerator :
+				size_t_max;
 	}
 
 protected:
