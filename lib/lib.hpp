@@ -30,21 +30,6 @@ static inline unsigned patch() {
 	return PROJECT_VERSION_PATCH;
 }
 
-class Pretty {
-private:
-	std::string const str;
-
-public:
-	template <typename... X>
-	Pretty(X &&...x): str{std::forward<X>(x)...} {
-		std::cout << "Enter: " << str << std::endl;
-	}
-
-	~Pretty() {
-		std::cout << "Leave: " << str << std::endl;
-	}
-};
-
 /* Allocator stuff
  */
 template <typename X, std::size_t N>
@@ -56,7 +41,6 @@ public:
 	using size_type = std::size_t;
 
 	AllocatorN() noexcept {
-		Pretty const pretty{__PRETTY_FUNCTION__};
 	}
 
 	template <typename Y, std::size_t M>
