@@ -65,6 +65,12 @@ public:
 	AllocatorN(AllocatorN<X, N> const &) = default;
 
 	template <typename Y, std::size_t M>
+	AllocatorN &operator =(AllocatorN<Y, M> &&) = delete;
+
+	template <typename Y, std::size_t M>
+	AllocatorN &operator =(AllocatorN<Y, M> const &) = delete;
+
+	template <typename Y, std::size_t M>
 	AllocatorN(AllocatorN<Y, M> const &) = delete;
 
 	template <typename Y, std::size_t M>
