@@ -52,13 +52,19 @@ private:
 		"N is too large for type X: sizeof(<the minimal underlying unsigned integral type for N>) must be not larger than sizeof(X)"
 	);
 
-	X (*a)[N];
+	union {
+		X val;
+		idx_t idx;
+	} (*buf)[N];
+
+	idx_t current;
+	idx_t filled;
 
 public:
 	using value_type = X;
 	using size_type = std::size_t;
 
-	AllocatorN() noexcept: a{nullptr} {
+	AllocatorN() noexcept: buf{nullptr}, current{}, filled{} {
 	}
 
 	AllocatorN(AllocatorN<X, N> &&) = default;
