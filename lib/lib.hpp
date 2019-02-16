@@ -36,6 +36,18 @@ static inline unsigned patch() {
 template <typename X, std::size_t N>
 class AllocatorN {
 private:
+	using idx_t =
+		typename std::conditional<N <= std::numeric_limits<uint8_t>::max(),
+			uint8_t,
+			typename std::conditional<N <= std::numeric_limits<uint16_t>::max(),
+				uint16_t,
+				typename std::conditional<N <= std::numeric_limits<uint32_t>::max(),
+					uint32_t,
+					std::size_t
+				>::type
+			>::type
+		>::type;
+
 
 public:
 	using value_type = X;
