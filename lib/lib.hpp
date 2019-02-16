@@ -48,6 +48,10 @@ private:
 			>::type
 		>::type;
 
+	static_assert(sizeof(X) >= sizeof(idx_t),
+		"N is too large for type X: sizeof(<the minimal underlying unsigned integral type for N>) must be not larger than sizeof(X)"
+	);
+
 
 public:
 	using value_type = X;
