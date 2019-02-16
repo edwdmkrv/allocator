@@ -91,19 +91,15 @@ static inline constexpr bool operator !=(AllocatorN<X, N> const &x, AllocatorN<Y
 template <typename X, typename A = std::allocator<X>>
 class ContainerExcecutive {
 private:
-	std::reference_wrapper<A> allocator;
-	std::unique_ptr<X[], std::function<void(X *const)>> ptr;
+	static_assert(std::is_nothrow_destructible<X>::value,
+		"Types with destructors that can throw exceptions are not supported"
+	);
+
+	A &allocator;
+	X *ptr;
 	std::size_t asize;
 	std::size_t dsize;
 
-	decltype(auto) deleter() noexcept {
-		return [this](X *const p) {
-			while (dsize) {
-				std::allocator_traits<A>::destroy(allocator, &p[--dsize]);
-			}
-		
-			std::allocator_traits<A>::deallocate(allocator, p, asize);
-		};
 	static constexpr std::size_t min_size(std::size_t const numerator, std::size_t const denominator, std::size_t const val = 0) {
 		return (val * numerator + denominator / 2) / denominator > val ? val : min_size(numerator, denominator, val + 1);
 	}
@@ -132,74 +128,51 @@ private:
 protected:
 	ContainerExcecutive(A &allocator, std::size_t const n = 0):
 	allocator{allocator},
-	ptr{n == 0 ? nullptr : std::allocator_traits<A>::allocate(allocator, n), deleter()},
+	ptr{n == 0 ? nullptr : std::allocator_traits<A>::allocate(allocator, n)},
 	asize{n},
 	dsize{} {
 	}
 
-	ContainerExcecutive<X, A>(ContainerExcecutive<X, A> &&vec) noexcept:
-	allocator{std::move(vec.allocator)},
-	ptr{std::move(vec.ptr)},
-	asize{std::move(vec.asize)},
-	dsize{std::move(vec.dsize)} {
-		std::swap(ptr.get_deleter(), vec.ptr.get_deleter());
-	}
-
-	ContainerExcecutive<X, A>(ContainerExcecutive<X, A> const &vec):
-	allocator{vec.allocator},
-	ptr{nullptr, deleter()},
-	asize{},
-	dsize{} {
-		reserve(vec.dsize);
-
-		for (std::size_t n{}; n < asize; n++) {
-			emplace_back(vec.ptr[n]);
-		}
-	}
-
-	ContainerExcecutive<X, A> &operator =(ContainerExcecutive<X, A> &&vec) noexcept {
-		std::swap(allocator, vec.allocator);
-		std::swap(ptr, vec.ptr);
-		std::swap(ptr.get_deleter(), vec.ptr.get_deleter());
-		std::swap(asize, vec.asize);
-		std::swap(dsize, vec.dsize);
-		std::cout << __PRETTY_FUNCTION__ << ": " << this << ", vec = " << &vec << std::endl;
-		return *this;
-	}
-
-	ContainerExcecutive<X, A> &operator =(ContainerExcecutive<X, A> const &vec) {
-		ContainerExcecutive<X, A> replacement{vec.allocator, vec.dsize};
-
-		for (std::size_t n{}; n < vec.dsize; n++) {
-			replacement.emplace_back(vec.ptr[n]);
+	~ContainerExcecutive() {
+		while (dsize) {
+			std::allocator_traits<A>::destroy(allocator, ptr + --dsize);
 		}
 
-		operator =(std::move(replacement));
-		return *this;
+		std::allocator_traits<A>::deallocate(allocator, ptr, asize);
 	}
 
 	void reserve(std::size_t const new_cap) {
 		if (new_cap > asize) {
-			ContainerExcecutive<X, A> vec{allocator, new_cap};
+			if (asize) {
+				ContainerExcecutive<X, A> vec{allocator, new_cap};
 
-			for (; vec.dsize < dsize; vec.dsize++) {
-				std::cout << __PRETTY_FUNCTION__ << ": " << this << ", n = " << vec.dsize << ", vec = " << &vec << std::endl;
-				if constexpr (std::is_nothrow_move_constructible<X>::value) {
-					std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], std::move(ptr[vec.dsize]));
-				} else {
-					std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], ptr[vec.dsize]);
+				for (; vec.dsize < dsize; vec.dsize++) {
+					std::cout << __PRETTY_FUNCTION__ << ": " << this << ", n = " << vec.dsize << ", vec = " << &vec << std::endl;
+					if constexpr (std::is_nothrow_move_constructible<X>::value) {
+						std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], std::move(ptr[vec.dsize]));
+					} else {
+						std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], ptr[vec.dsize]);
+					}
 				}
-			}
 
-			operator =(std::move(vec));
+				std::swap(ptr, vec.ptr);
+				std::swap(asize, vec.asize);
+				std::swap(dsize, vec.dsize);
+			} else {
+				ptr = std::allocator_traits<A>::allocate(allocator, new_cap);
+				asize = new_cap;
+			}
 		}
 
 	}
 
 	template <typename... Y>
 	X &emplace_back(Y &&... y) {
-		reserve(dsize + 1);
-		std::allocator_traits<A>::construct(allocator, &ptr[dsize], std::forward<Y>(y)...);
+		if (dsize == asize) {
+			reserve(new_size());
+		}
+
+		std::allocator_traits<A>::construct(allocator, ptr + dsize, std::forward<Y>(y)...);
 		return ptr[dsize++];
 	}
 
@@ -240,12 +213,6 @@ public:
 	~Container() {
 		std::cout << __PRETTY_FUNCTION__ << ": " << this << std::endl;
 	}
-
-	Container(Container const &) = default;
-	Container(Container &&) = default;
-
-	Container &operator =(Container &&) = default;
-	Container &operator =(Container const &) = default;
 
 	using ContainerExcecutive<X, A>::reserve;
 	using ContainerExcecutive<X, A>::emplace_back;
