@@ -87,7 +87,7 @@ public:
 		std::cout << __PRETTY_FUNCTION__ << ", n = " << n << ", p = " << p << std::endl;
 
 		if (!p) {
-			throw std::bad_cast{};
+			throw std::bad_alloc{};
 		}
 
 		return reinterpret_cast<X *>(p);
