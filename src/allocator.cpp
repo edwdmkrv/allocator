@@ -26,8 +26,10 @@ static void map() {
 		map.try_emplace(n, factorial(n));
 	}
 
-	for (auto const &pair: map) {
-		std::cout << pair.first << ' ' << pair.second << std::endl;
+	if constexpr (!std::is_same<A<X>, std::allocator<X>>::value) {
+		for (auto const &pair: map) {
+			std::cout << pair.first << ' ' << pair.second << std::endl;
+		}
 	}
 }
 
@@ -43,8 +45,10 @@ static void container() {
 		container.emplace_back(n);
 	}
 
-	for (auto const &item: container) {
-		std::cout << item << std::endl;
+	if constexpr (!std::is_same<A<X>, std::allocator<X>>::value) {
+		for (auto const &item: container) {
+			std::cout << item << std::endl;
+		}
 	}
 }
 
