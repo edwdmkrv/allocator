@@ -43,12 +43,14 @@ public:
 	AllocatorN() noexcept {
 	}
 
+	AllocatorN(AllocatorN<X, N> &&) = default;
+	AllocatorN(AllocatorN<X, N> const &) = default;
+
 	template <typename Y, std::size_t M>
 	AllocatorN(AllocatorN<Y, M> const &) = delete;
 
 	template <typename Y, std::size_t M>
-	AllocatorN(AllocatorN<Y, M> &&) {
-	}
+	AllocatorN(AllocatorN<Y, M> &&) = delete;
 
 	template <typename Y, std::size_t M = N>
 	struct rebind {
@@ -75,7 +77,7 @@ public:
 
 template <typename X, std::size_t N, typename Y, std::size_t M>
 static inline constexpr bool operator ==(AllocatorN<X, N> const &x, AllocatorN<Y, M> const &y) noexcept {
-	return std::is_same<X, Y>::value && &x == &y;
+	return std::is_same<X, Y>::value && N == M && &x == &y;
 }
 
 template <typename X, std::size_t N, typename Y, std::size_t M>
