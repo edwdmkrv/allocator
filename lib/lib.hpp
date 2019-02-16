@@ -126,10 +126,17 @@ private:
 	}
 
 protected:
-	ContainerExcecutive(A &allocator, std::size_t const n = 0):
+	explicit ContainerExcecutive(A &allocator) noexcept:
 	allocator{allocator},
-	ptr{n == 0 ? nullptr : std::allocator_traits<A>::allocate(allocator, n)},
-	asize{n},
+	ptr{nullptr},
+	asize{},
+	dsize{} {
+	}
+
+	ContainerExcecutive(A &allocator, std::size_t const asize):
+	allocator{allocator},
+	ptr{std::allocator_traits<A>::allocate(allocator, asize)},
+	asize{asize},
 	dsize{} {
 	}
 
