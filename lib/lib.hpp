@@ -113,7 +113,7 @@ public:
 	}
 
 	bool is_valid(X *const p) const noexcept {
-		return p >= &buf[0]->val || p < &buf[1]->val;
+		return p >= &buf[0]->val && p < &buf[1]->val;
 	}
 };
 
