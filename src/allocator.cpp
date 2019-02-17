@@ -39,7 +39,7 @@ static void container() {
 
 	enum: X {start = 0, end = 10};
 
-	std::vector<X, A<X>> container{};
+	Container<X, A<X>> container{};
 
 	for (X n{start}; n < end; n++) {
 		container.emplace_back(n);
