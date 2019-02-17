@@ -196,7 +196,7 @@ private:
 protected:
 	explicit ContainerExcecutive(A &allocator) noexcept:
 	allocator{allocator},
-	ptr{nullptr},
+	ptr{},
 	asize{},
 	dsize{} {
 	}
