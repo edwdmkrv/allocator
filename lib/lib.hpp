@@ -53,69 +53,105 @@ private:
 		"N is too large for type X: sizeof(<the minimal underlying unsigned integral type for N>) must be not larger than sizeof(X)"
 	);
 
-	union {
-		X val;
-		idx_t idx;
-	} (*buf)[N];
+	class Data {
+	private:
+		union {
+			X val;
+			idx_t idx;
+		} (*buf)[N];
 
-	idx_t current;
-	idx_t filled;
+		idx_t current;
+		idx_t filled;
+
+	public:
+		Data() noexcept: buf{}, current{}, filled{} {
+		}
+
+		~Data() {
+			if (buf) {
+				free(buf);
+			}
+		}
+
+		X *allocate() {
+			if (!buf) {
+				if (!(buf = reinterpret_cast<decltype(buf)>(malloc(sizeof *buf)))) {
+					throw std::bad_alloc();
+				}
+
+				idx_t n{1};
+
+				for (auto &item: *buf) {
+					item.idx = n++;
+				}
+
+				current = 0;
+				filled = 0;
+			}
+
+			idx_t const allocated = current;
+
+			current = buf[0][current].idx;
+			filled++;
+
+			return &buf[0][allocated].val;
+		}
+
+		void deallocate(X *const p) noexcept {
+			if (filled > 0) {
+				idx_t const precurrent{static_cast<idx_t>(p - &buf[0]->val)};
+
+				buf[0][precurrent].idx = current;
+				current = precurrent;
+
+				if (!--filled) {
+					free(buf);
+					buf = nullptr;
+					current = 0;
+				}
+			}
+		}
+
+		bool can_allocate() const noexcept {
+			return filled != N;
+		}
+
+		bool is_valid(X *const p) const noexcept {
+			return p >= &buf[0]->val && p < &buf[1]->val;
+		}
+	};
+
+	std::shared_ptr<Data> data;
 
 public:
-	SpecialAllocator() noexcept: buf{nullptr}, current{}, filled{} {
-	}
+	SpecialAllocator() noexcept = default;
 
-	~SpecialAllocator() {
-		if (buf) {
-			free(buf);
-		}
-	}
+	SpecialAllocator(SpecialAllocator &&) noexcept = default;
+	SpecialAllocator(SpecialAllocator const &) noexcept(noexcept(std::shared_ptr<Data>(data))) = default;
+
+	SpecialAllocator &operator =(SpecialAllocator &&) = delete;
+	SpecialAllocator &operator =(SpecialAllocator const &) = delete;
 
 	X *allocate() {
-		if (!buf) {
-			if (!(buf = reinterpret_cast<decltype(buf)>(malloc(sizeof *buf)))) {
-				throw std::bad_alloc();
-			}
-
-			idx_t n{1};
-
-			for (auto &item: *buf) {
-				item.idx = n++;
-			}
-
-			current = 0;
-			filled = 0;
+		if (!data) {
+			data = std::make_shared<Data>();
 		}
 
-		idx_t const allocated = current;
-
-		current = buf[0][current].idx;
-		filled++;
-
-		return &buf[0][allocated].val;
+		return data->allocate();
 	}
 
 	void deallocate(X *const p) noexcept {
-		if (filled > 0) {
-			idx_t const precurrent{static_cast<idx_t>(p - &buf[0]->val)};
-
-			buf[0][precurrent].idx = current;
-			current = precurrent;
-
-			if (!--filled) {
-				free(buf);
-				buf = nullptr;
-				current = 0;
-			}
+		if (data) {
+			data->deallocate(p);
 		}
 	}
 
 	bool can_allocate() const noexcept {
-		return filled != N;
+		return !data || data->can_allocate();
 	}
 
 	bool is_valid(X *const p) const noexcept {
-		return p >= &buf[0]->val && p < &buf[1]->val;
+		return data && data->is_valid(p);
 	}
 };
 
