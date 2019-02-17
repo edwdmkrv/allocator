@@ -84,10 +84,10 @@ private:
 					throw std::bad_alloc();
 				}
 
-				idx_t n{1};
+				idx_t n{};
 
 				for (auto &item: *buf) {
-					item.idx = n++;
+					item.idx = ++n;
 				}
 
 				current = 0;
