@@ -23,7 +23,7 @@ static void map() {
 	std::map<X, X, std::less<X>, A<std::pair<X const, X>>> map;
 
 	for (X n{start}; n < end; n++) {
-		map.try_emplace(n, factorial(n));
+		map.emplace(n, factorial(n));
 	}
 
 	if constexpr (!std::is_same<A<X>, std::allocator<X>>::value) {
