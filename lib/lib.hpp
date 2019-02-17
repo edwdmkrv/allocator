@@ -66,7 +66,9 @@ public:
 	}
 
 	~SpecialAllocator() {
-		free(buf);
+		if (buf) {
+			free(buf);
+		}
 	}
 
 	X *allocate() {
