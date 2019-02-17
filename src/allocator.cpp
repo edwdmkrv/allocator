@@ -8,8 +8,13 @@
 
 template <typename X>
 static constexpr X factorial(X const n) noexcept {
-	static_assert(std::is_integral<X>::value, "The value of an integral type is expected for the argument of function factorial");
-	static_assert(std::is_unsigned<X>::value, "The value of an unsigned type is expected for the argument of function factorial");
+	static_assert(std::is_integral<X>::value,
+		"The value of an integral type is expected for the argument of function factorial"
+	);
+
+	static_assert(std::is_unsigned<X>::value,
+		"The value of an unsigned type is expected for the argument of function factorial"
+	);
 
 	return n == 0 ? 1 : n * factorial(n - 1);
 }
