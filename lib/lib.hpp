@@ -96,7 +96,6 @@ public:
 				}
 
 				idx_t n{1};
-		std::cout << __PRETTY_FUNCTION__ << ", n = " << n << ", p = " << p << std::endl;
 
 				for (auto &item: *buf) {
 					item.idx = n++;
