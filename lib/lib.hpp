@@ -55,7 +55,12 @@ private:
 
 	class Data {
 	private:
+/* Shame on Microsoft: the only one who does not support untagged unions */
+#ifdef _MSC_VER
+		union U {
+#else
 		union {
+#endif
 			X val;
 			idx_t idx;
 		} (*buf)[N];
