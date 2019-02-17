@@ -346,7 +346,7 @@ protected:
 	}
 
 	bool empty() const noexcept {
-		return !ptr;
+		return !dsize;
 	}
 
 	std::size_t capacity() const noexcept {
