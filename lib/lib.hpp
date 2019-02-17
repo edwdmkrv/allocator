@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include <new>
+#include <stdexcept>
 #include <memory>
 #include <utility>
 #include <limits>
@@ -263,6 +264,12 @@ private:
 				size_t_max;
 	}
 
+	void check_bounds(std::size_t const pos) const {
+		if (pos >= dsize) {
+			throw std::out_of_range{"Index is out of range"};
+		}
+	}
+
 protected:
 	explicit ContainerExcecutive(A &allocator) noexcept:
 	allocator{allocator},
@@ -320,6 +327,16 @@ protected:
 		return ptr[dsize++];
 	}
 
+	X &at(std::size_t const pos) {
+		check_bounds(pos);
+		return ptr[pos];
+	}
+
+	X const &at(std::size_t const pos) const {
+		check_bounds(pos);
+		return ptr[pos];
+	}
+
 	X *begin() noexcept {
 		return &ptr[0];
 	}
@@ -358,6 +375,7 @@ public:
 
 	using ContainerExcecutive<X, A>::reserve;
 	using ContainerExcecutive<X, A>::emplace_back;
+	using ContainerExcecutive<X, A>::at;
 	using ContainerExcecutive<X, A>::begin;
 	using ContainerExcecutive<X, A>::end;
 	using ContainerExcecutive<X, A>::empty;
