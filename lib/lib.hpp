@@ -35,7 +35,7 @@ static inline unsigned patch() {
 /* Allocator stuff
  */
 template <typename X, std::size_t N>
-class AllocatorN {
+class SpecialAllocator {
 private:
 	using idx_t =
 		typename std::conditional<N <= std::numeric_limits<uint8_t>::max(),
@@ -62,13 +62,73 @@ private:
 	idx_t filled;
 
 public:
+	SpecialAllocator() noexcept: buf{nullptr}, current{}, filled{} {
+	}
+
+	~SpecialAllocator() {
+		free(buf);
+	}
+
+	X *allocate() {
+		if (!buf) {
+			if (!(buf = reinterpret_cast<decltype(buf)>(malloc(sizeof *buf)))) {
+				throw std::bad_alloc();
+			}
+
+			idx_t n{1};
+
+			for (auto &item: *buf) {
+				item.idx = n++;
+			}
+
+			current = 0;
+			filled = 0;
+		}
+
+		idx_t const allocated = current;
+
+		current = buf[0][current].idx;
+		filled++;
+
+		return &buf[0][allocated].val;
+	}
+
+	void deallocate(X *const p) noexcept {
+		if (filled > 0) {
+			idx_t const precurrent{static_cast<idx_t>(p - &buf[0]->val)};
+
+			buf[0][precurrent].idx = current;
+			current = precurrent;
+
+			if (!--filled) {
+				free(buf);
+				buf = nullptr;
+				current = 0;
+			}
+		}
+	}
+
+	bool can_allocate() const noexcept {
+		return filled != N;
+	}
+
+	bool is_valid(X *const p) const noexcept {
+		return p >= &buf[0]->val || p < &buf[1]->val;
+	}
+};
+
+template <typename X, std::size_t N>
+class AllocatorN {
+private:
+	SpecialAllocator<X, N> allocator;
+
+public:
 	using value_type = X;
 	using size_type = std::size_t;
 
-	AllocatorN() noexcept: buf{nullptr}, current{}, filled{} {
-	}
+	AllocatorN() noexcept = default;
 
-	AllocatorN(AllocatorN<X, N> &&) = default;
+	AllocatorN(AllocatorN<X, N> &&) noexcept = default;
 	AllocatorN(AllocatorN<X, N> const &) = default;
 
 	template <typename Y, std::size_t M>
@@ -89,31 +149,10 @@ public:
 	};
 
 	X *allocate(size_type const n) {
-		if (n == 1 && filled != N) {
-			if (!buf) {
-				if (!(buf = reinterpret_cast<decltype(buf)>(malloc(sizeof *buf)))) {
-					throw std::bad_alloc();
-				}
-
-				idx_t n{1};
-
-				for (auto &item: *buf) {
-					item.idx = n++;
-				}
-
-				current = 0;
-				filled = 0;
-			}
-
-			idx_t const allocated = current;
-
-			current = buf[0][current].idx;
-			filled++;
-
-			return &buf[0][allocated].val;
+		if (n == 1 && allocator.can_allocate()) {
+			return allocator.allocate();
 		} else {
 			void *const p{malloc(n * sizeof *allocate(n))};
-
 
 			if (!p) {
 				throw std::bad_alloc{};
@@ -124,19 +163,8 @@ public:
 	}
 
 	void deallocate(X *const p, size_type const n) noexcept {
-		if (n == 1 && (p >= &buf[0]->val || p < &buf[1]->val)) {
-			if (filled > 0) {
-				idx_t const precurrent{static_cast<idx_t>(p - &buf[0]->val)};
-
-				buf[0][precurrent].idx = current;
-				current = precurrent;
-
-				if (!--filled) {
-					free(buf);
-					buf = nullptr;
-					current = 0;
-				}
-			}
+		if (n == 1 && allocator.is_valid(p)) {
+			allocator.deallocate(p);
 		} else {
 			free(p);
 		}
