@@ -58,10 +58,10 @@ using Allocator = AllocatorN<X, 10>;
 int main() try {
 	std::cout.exceptions(std::ostream::badbit | std::ostream::failbit | std::ostream::eofbit);
 
-//	map<std::size_t, std::allocator>();
-//	map<std::size_t, Allocator>();
+	map<std::size_t, std::allocator>();
+	map<std::size_t, Allocator>();
 
-//	container<int, std::allocator>();
+	container<int, std::allocator>();
 	container<int, Allocator>();
 
 	return EXIT_SUCCESS;
