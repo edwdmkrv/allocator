@@ -19,7 +19,9 @@ static constexpr X factorial(X const n) noexcept {
 
 template <typename X, template <typename> typename A>
 static void map() {
-	static_assert(std::is_integral<X>::value, "The value of an integral type is expected for the argument of function map");
+	static_assert(std::is_integral<X>::value,
+		"The value of an integral type is expected for the template argument of function map"
+	);
 
 	enum: X {start = 0, end = 10};
 
@@ -38,7 +40,9 @@ static void map() {
 
 template <typename X, template <typename> typename A>
 static void container() {
-	static_assert(std::is_integral<X>::value, "The value of an integral type is expected for the argument of function container");
+	static_assert(std::is_integral<X>::value,
+		"The value of an integral type is expected for the template argument of function container"
+	);
 
 	enum: X {start = 0, end = 10};
 
