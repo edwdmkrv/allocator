@@ -345,6 +345,14 @@ protected:
 		return ptr + dsize;
 	}
 
+	X const *begin() const noexcept {
+		return ptr;
+	}
+
+	X const *end() const noexcept {
+		return ptr + dsize;
+	}
+
 	bool empty() const noexcept {
 		return !dsize;
 	}
