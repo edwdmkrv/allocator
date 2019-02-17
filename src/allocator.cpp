@@ -2,8 +2,6 @@
 #include <type_traits>
 #include <iostream>
 
-#include <vector>
-
 #include "lib.hpp"
 
 template <typename X>
