@@ -124,7 +124,6 @@ public:
 	}
 
 	void deallocate(X *const p, size_type const n) noexcept {
-		std::cout << __PRETTY_FUNCTION__ << ", n = " << n << ", p = " << p << std::endl;
 		if (n == 1 && (p >= &buf[0]->val || p < &buf[1]->val)) {
 			if (filled > 0) {
 				idx_t const precurrent{static_cast<idx_t>(p - &buf[0]->val)};
@@ -222,7 +221,6 @@ protected:
 				ContainerExcecutive<X, A> vec{allocator, new_cap};
 
 				for (; vec.dsize < dsize; vec.dsize++) {
-					std::cout << __PRETTY_FUNCTION__ << ": " << this << ", n = " << vec.dsize << ", vec = " << &vec << std::endl;
 					if constexpr (std::is_nothrow_move_constructible<X>::value) {
 						std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], std::move(ptr[vec.dsize]));
 					} else {
@@ -282,11 +280,9 @@ template <typename X, typename A = std::allocator<X>>
 class Container: private AllocatorWrapper<X, A>, protected ContainerExcecutive<X, A> {
 public:
 	Container() noexcept(noexcept(A{})) : ContainerExcecutive<X, A>{AllocatorWrapper<X, A>::allocator} {
-		std::cout << __PRETTY_FUNCTION__ << ": " << this << std::endl;
 	}
 
 	~Container() {
-		std::cout << __PRETTY_FUNCTION__ << ": " << this << std::endl;
 	}
 
 	using ContainerExcecutive<X, A>::reserve;
