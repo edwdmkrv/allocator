@@ -338,11 +338,11 @@ protected:
 	}
 
 	X *begin() noexcept {
-		return &ptr[0];
+		return ptr;
 	}
 
 	X *end() noexcept {
-		return &ptr[dsize];
+		return ptr + dsize;
 	}
 
 	bool empty() const noexcept {
