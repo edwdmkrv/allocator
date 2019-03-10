@@ -58,13 +58,13 @@ private:
 
 		~Data() {
 			if (buf) {
-				free(buf);
+				std::free(buf);
 			}
 		}
 
 		X *allocate() {
 			if (!buf) {
-				if (!(buf = reinterpret_cast<decltype(buf)>(malloc(sizeof *buf)))) {
+				if (!(buf = reinterpret_cast<decltype(buf)>(std::malloc(sizeof *buf)))) {
 					throw std::bad_alloc();
 				}
 
@@ -94,7 +94,7 @@ private:
 				current = precurrent;
 
 				if (!--filled) {
-					free(buf);
+					std::free(buf);
 					buf = nullptr;
 					current = 0;
 				}
