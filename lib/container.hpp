@@ -119,6 +119,14 @@ protected:
 		return ptr[pos];
 	}
 
+	X &operator [](std::size_t const pos) {
+		return ptr[pos];
+	}
+
+	X const &operator [](std::size_t const pos) const {
+		return ptr[pos];
+	}
+
 	X *begin() noexcept {
 		return ptr;
 	}
@@ -168,6 +176,7 @@ public:
 	using ContainerExecutive<X, A>::reserve;
 	using ContainerExecutive<X, A>::emplace_back;
 	using ContainerExecutive<X, A>::at;
+	using ContainerExecutive<X, A>::operator [];
 	using ContainerExecutive<X, A>::begin;
 	using ContainerExecutive<X, A>::end;
 	using ContainerExecutive<X, A>::empty;
