@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.6)
+cmake_minimum_required (VERSION 3.12)
 
 # Version/options stuff
 set (TRAVIS_BUILD_NUMBER "$ENV{TRAVIS_BUILD_NUMBER}")
