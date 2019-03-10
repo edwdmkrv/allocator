@@ -10,7 +10,7 @@
 
 namespace ver {
 
-static inline std::string ver() {
+static inline std::string full() {
 	return PROJECT_VERSION;
 }
 
