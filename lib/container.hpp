@@ -36,6 +36,14 @@ private:
 			denominator = 13
 		}; // 21 / 13 ~ (sqrt(5) + 1) / 2 (golden section)
 
+		static_assert(denominator != 0,
+			"Denominator is 0? Are you kidding me???"
+		);
+
+		static_assert(numerator > denominator && denominator / (numerator - denominator) < 10,
+			"The value of (numerator / denominator) must be greater than 1.1"
+		);
+
 		if (asize == size_t_max) {
 			throw std::bad_alloc{};
 		}
