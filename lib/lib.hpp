@@ -299,11 +299,7 @@ protected:
 				ContainerExcecutive<X, A> vec{allocator, new_cap};
 
 				for (; vec.dsize < dsize; vec.dsize++) {
-					if constexpr (std::is_nothrow_move_constructible<X>::value) {
-						std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], std::move(ptr[vec.dsize]));
-					} else {
-						std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], ptr[vec.dsize]);
-					}
+					std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], std::move_if_noexcept(ptr[vec.dsize]));
 				}
 
 				std::swap(ptr, vec.ptr);
