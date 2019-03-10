@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 TEST(Container, InitialValues) {
-	Container<int> container;
+	usr::Container<int> container;
 
 	EXPECT_TRUE(container.empty());
 	EXPECT_EQ(container.capacity(), 0);
@@ -12,7 +12,7 @@ TEST(Container, InitialValues) {
 }
 
 TEST(Container, SingleValue) {
-	Container<int> container;
+	usr::Container<int> container;
 
 	container.emplace_back(5);
 
@@ -32,7 +32,7 @@ TEST(Container, SingleValue) {
 }
 
 TEST(Container, Reserve) {
-	Container<int> container;
+	usr::Container<int> container;
 
 	container.reserve(10);
 
@@ -66,7 +66,7 @@ TEST(Container, Reserve) {
 TEST(Container, ReserveStress) {
 	enum: std::size_t {num = 55'555'555};
 
-	Container<std::size_t> container;
+	usr::Container<std::size_t> container;
 
 	container.reserve(num);
 
@@ -78,7 +78,7 @@ TEST(Container, ReserveStress) {
 TEST(Container, NoReserveStress) {
 	enum: std::size_t {num = 55'555'555};
 
-	Container<std::size_t> container;
+	usr::Container<std::size_t> container;
 
 	for (std::size_t n{}; n < num; n++) {
 		container.emplace_back(n);

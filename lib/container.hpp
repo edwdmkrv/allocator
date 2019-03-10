@@ -6,8 +6,13 @@
 #include <limits>
 #include <type_traits>
 
+namespace usr {
+
 /* Container stuff
  */
+
+namespace internal {
+
 template <typename X, typename A = std::allocator<X>>
 class ContainerExecutive {
 private:
@@ -149,10 +154,15 @@ protected:
 	A allocator;
 };
 
+} // namespace internal
+
 template <typename X, typename A = std::allocator<X>>
-class Container: private AllocatorWrapper<X, A>, protected ContainerExecutive<X, A> {
+class Container: private internal::AllocatorWrapper<X, A>, protected internal::ContainerExecutive<X, A> {
+	template <typename Y, typename Z>
+	using ContainerExecutive = internal::ContainerExecutive<Y, Z>;
+
 public:
-	Container() noexcept(noexcept(A{})) : ContainerExecutive<X, A>{AllocatorWrapper<X, A>::allocator} {
+	Container() noexcept(noexcept(A{})) : ContainerExecutive<X, A>{internal::AllocatorWrapper<X, A>::allocator} {
 	}
 
 	using ContainerExecutive<X, A>::reserve;
@@ -164,5 +174,7 @@ public:
 	using ContainerExecutive<X, A>::capacity;
 	using ContainerExecutive<X, A>::size;
 };
+
+} //namespace usr
 
 #endif
