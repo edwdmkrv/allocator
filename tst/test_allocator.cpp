@@ -6,7 +6,7 @@
 
 template <typename X, std::size_t Size, std::size_t Extra>
 void TestVariousSizesAllocation() noexcept try {
-	AllocatorN<X, Size> allocator;
+	usr::AllocatorN<X, Size> allocator;
 	X *prev{allocator.allocate(1)};
 
 	unsigned n{};
@@ -65,7 +65,7 @@ TEST(Allocator, TestSizeTAllocation) {
 
 template <typename X, std::size_t Size, std::size_t Extra>
 void TestVariousSizesSourceOfAllocation() noexcept try {
-	AllocatorN<X, Size> allocator;
+	usr::AllocatorN<X, Size> allocator;
 	X *prev{allocator.allocate(1)};
 
 	unsigned n{};

@@ -61,7 +61,7 @@ static void container() {
 }
 
 template <typename X>
-using Allocator = AllocatorN<X, 10>;
+using Allocator = usr::AllocatorN<X, 10>;
 
 int main() try {
 	std::cout.exceptions(std::ostream::badbit | std::ostream::failbit | std::ostream::eofbit);

@@ -11,8 +11,13 @@
 #include <limits>
 #include <type_traits>
 
+namespace usr {
+
 /* Allocator stuff
  */
+
+namespace internal {
+
 template <typename X, std::size_t N>
 class SpecialAllocator {
 private:
@@ -139,10 +144,12 @@ public:
 	}
 };
 
+} // namespace internal
+
 template <typename X, std::size_t N>
 class AllocatorN {
 private:
-	SpecialAllocator<X, N> allocator;
+	internal::SpecialAllocator<X, N> allocator;
 
 public:
 	using value_type = X;
@@ -202,5 +209,7 @@ template <typename X, std::size_t N, typename Y, std::size_t M>
 static inline constexpr bool operator !=(AllocatorN<X, N> const &x, AllocatorN<Y, M> const &y) noexcept {
 	return !operator ==(x, y);
 }
+
+} // namespace usr
 
 #endif
