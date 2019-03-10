@@ -7,6 +7,9 @@
 
 /* Version stuff
  */
+
+namespace ver {
+
 static inline std::string ver() {
 	return PROJECT_VERSION;
 }
@@ -23,5 +26,6 @@ static inline unsigned patch() {
 	return PROJECT_VERSION_PATCH;
 }
 
+} // namespace ver
 
 #endif
