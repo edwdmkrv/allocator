@@ -9,7 +9,7 @@
 /* Container stuff
  */
 template <typename X, typename A = std::allocator<X>>
-class ContainerExcecutive {
+class ContainerExecutive {
 private:
 	static_assert(std::is_nothrow_destructible<X>::value,
 		"Types with destructors that can throw exceptions are not supported"
@@ -52,21 +52,21 @@ private:
 	}
 
 protected:
-	explicit ContainerExcecutive(A &allocator) noexcept:
+	explicit ContainerExecutive(A &allocator) noexcept:
 	allocator{allocator},
 	ptr{},
 	asize{},
 	dsize{} {
 	}
 
-	ContainerExcecutive(A &allocator, std::size_t const asize):
+	ContainerExecutive(A &allocator, std::size_t const asize):
 	allocator{allocator},
 	ptr{std::allocator_traits<A>::allocate(allocator, asize)},
 	asize{asize},
 	dsize{} {
 	}
 
-	~ContainerExcecutive() {
+	~ContainerExecutive() {
 		while (dsize) {
 			std::allocator_traits<A>::destroy(allocator, ptr + --dsize);
 		}
@@ -77,7 +77,7 @@ protected:
 	void reserve(std::size_t const new_cap) {
 		if (new_cap > asize) {
 			if (asize) {
-				ContainerExcecutive<X, A> vec{allocator, new_cap};
+				ContainerExecutive<X, A> vec{allocator, new_cap};
 
 				for (; vec.dsize < dsize; vec.dsize++) {
 					std::allocator_traits<A>::construct(allocator, &vec.ptr[vec.dsize], std::move_if_noexcept(ptr[vec.dsize]));
@@ -150,19 +150,19 @@ protected:
 };
 
 template <typename X, typename A = std::allocator<X>>
-class Container: private AllocatorWrapper<X, A>, protected ContainerExcecutive<X, A> {
+class Container: private AllocatorWrapper<X, A>, protected ContainerExecutive<X, A> {
 public:
-	Container() noexcept(noexcept(A{})) : ContainerExcecutive<X, A>{AllocatorWrapper<X, A>::allocator} {
+	Container() noexcept(noexcept(A{})) : ContainerExecutive<X, A>{AllocatorWrapper<X, A>::allocator} {
 	}
 
-	using ContainerExcecutive<X, A>::reserve;
-	using ContainerExcecutive<X, A>::emplace_back;
-	using ContainerExcecutive<X, A>::at;
-	using ContainerExcecutive<X, A>::begin;
-	using ContainerExcecutive<X, A>::end;
-	using ContainerExcecutive<X, A>::empty;
-	using ContainerExcecutive<X, A>::capacity;
-	using ContainerExcecutive<X, A>::size;
+	using ContainerExecutive<X, A>::reserve;
+	using ContainerExecutive<X, A>::emplace_back;
+	using ContainerExecutive<X, A>::at;
+	using ContainerExecutive<X, A>::begin;
+	using ContainerExecutive<X, A>::end;
+	using ContainerExecutive<X, A>::empty;
+	using ContainerExecutive<X, A>::capacity;
+	using ContainerExecutive<X, A>::size;
 };
 
 #endif
