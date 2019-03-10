@@ -155,9 +155,6 @@ public:
 	Container() noexcept(noexcept(A{})) : ContainerExcecutive<X, A>{AllocatorWrapper<X, A>::allocator} {
 	}
 
-	~Container() {
-	}
-
 	using ContainerExcecutive<X, A>::reserve;
 	using ContainerExcecutive<X, A>::emplace_back;
 	using ContainerExcecutive<X, A>::at;
