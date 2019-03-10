@@ -11,8 +11,6 @@
 #include <limits>
 #include <type_traits>
 
-#include <version.hpp>
-
 /* Allocator stuff
  */
 template <typename X, std::size_t N>
