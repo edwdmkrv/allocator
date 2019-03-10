@@ -21,7 +21,7 @@ endif (BUILD_TYPE_RELEASE)
 project (allocator
 	VERSION 0.0.${TRAVIS_BUILD_NUMBER}
 	DESCRIPTION "Homework 3 Allocator & Container implementation"
-	HOMEPAGE_URL "https://github.com/edwdmkrv/HW-02-C-14"
+	HOMEPAGE_URL "https://github.com/edwdmkrv/allocator"
 	LANGUAGES CXX
 )
 

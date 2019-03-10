@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 3.12)
 project (allocator_pkg
 	VERSION 0.0.${TRAVIS_BUILD_NUMBER}
 	DESCRIPTION "Homework 3 Allocator & Container implementation package"
-	HOMEPAGE_URL "https://github.com/edwdmkrv/HW-02-C-14/tree/master/pkg"
+	HOMEPAGE_URL "https://github.com/edwdmkrv/allocator/tree/master/pkg"
 	LANGUAGES CXX
 )
 
